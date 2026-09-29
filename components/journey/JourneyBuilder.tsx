@@ -1168,9 +1168,9 @@ export default function JourneyBuilder() {
 
           md:py-4
 
-          lg:h-[100dvh]
+          lg:min-h-[100dvh]
 
-          lg:overflow-hidden
+          lg:overflow-visible
 
           xl:px-6
 
@@ -1218,9 +1218,9 @@ export default function JourneyBuilder() {
 
             md:rounded-[32px]
 
-            lg:h-[calc(100dvh-32px)]
+            lg:min-h-[calc(100dvh-32px)]
 
-            lg:min-h-0
+            lg:h-auto
 
           "
 
@@ -1594,8 +1594,12 @@ export default function JourneyBuilder() {
               className="
                 min-h-0
                 flex-1
+                overflow-y-auto
+                overscroll-contain
                 pt-2
+                pb-3
                 md:pt-3
+                lg:max-h-[calc(100dvh-190px)]
               "
             >
 
@@ -1716,15 +1720,19 @@ export default function JourneyBuilder() {
                   <div
 
                     className="
-
+                      sticky
+                      bottom-0
+                      z-20
+                      -mx-2
                       mt-7
-
                       flex
-
                       items-end
-
                       justify-between
-
+                      rounded-xl
+                      bg-white/90
+                      px-2
+                      py-2
+                      backdrop-blur-md
                     "
 
                   >
@@ -2509,7 +2517,7 @@ export default function JourneyBuilder() {
             ================================================ */}
 
             {step > 0 && step < TOTAL - 1 && (
-              <div className="mt-3 flex justify-end pb-1">
+              <div className="sticky bottom-0 z-30 -mx-2 mt-3 flex justify-end rounded-xl bg-white/90 px-2 py-2 backdrop-blur-md">
                 <button
                   type="button"
                   onClick={() => setStep(step + 1)}
