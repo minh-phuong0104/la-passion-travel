@@ -2379,9 +2379,8 @@ export default function JourneyBuilder() {
 
       {/* LEFT FORM */}
 
-      <div className="p-5 md:p-6">
-
-        <div className="grid gap-3.5">
+      <div className="p-4 md:p-5">
+          <div className="grid gap-2.5">
 
           {/* BUDGET */}
 
@@ -2470,8 +2469,9 @@ export default function JourneyBuilder() {
             </h2>
 
             <p className="mt-1 text-[13px] text-black/50">
+              We will contact you by email or WhatsApp to finalize your journey.
 
-              We will contact you via WhatsApp to finalize your journey.
+              
 
             </p>
 
@@ -2648,113 +2648,75 @@ export default function JourneyBuilder() {
 
           </div>
 
-          {/* CONSENT */}
+          {/* CONSENT + SUBMIT */}
+<div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+  <div>
+    <label
+      className="
+        flex
+        items-start
+        gap-3
+        rounded-xl
+        bg-[#f5f2e9]
+        p-3
+        text-sm
+        leading-5
+        text-black/70
+      "
+    >
+      <input
+        type="checkbox"
+        className="
+          mt-[2px]
+          h-5
+          w-5
+          shrink-0
+          accent-[#66704f]
+        "
+        checked={c.consent}
+        onChange={(e) =>
+          setC({
+            ...c,
+            consent: e.currentTarget.checked,
+          })
+        }
+        aria-invalid={!!errs.consent}
+      />
 
-          <label
+      I agree to receive travel advice and updates from La Passion Travel.
+    </label>
 
-            className="
+    {err("consent")}
+  </div>
 
-              flex
-
-              items-start
-
-              gap-3
-
-              rounded-xl
-
-              bg-[#f5f2e9]
-
-              p-3.5
-
-              text-sm
-
-              leading-5
-
-              text-black/70
-
-            "
-
-          >
-
-            <input
-
-              type="checkbox"
-
-              className="
-
-                mt-[2px]
-
-                h-5
-
-                w-5
-
-                shrink-0
-
-                accent-[#66704f]
-
-              "
-
-              checked={c.consent}
-
-              onChange={(e) =>
-
-                setC({
-
-                  ...c,
-
-                  consent:
-
-                    e.currentTarget.checked,
-
-                })
-
-              }
-
-              aria-invalid={!!errs.consent}
-
-            />
-
-            I agree to receive travel advice and updates from La Passion Travel.
-
-          </label>
-
-          {err("consent")}
-
-          {msg && (
-
-            <p
-
-              role="alert"
-
-              className="
-
-                rounded-xl
-
-                border
-
-                border-red-700/30
-
-                bg-red-50
-
-                p-3
-
-                text-sm
-
-                text-red-800
-
-              "
-
-            >
-
-              {msg}
-
-            </p>
-
-          )}
-
-        </div>
-
-      </div>
+  <button
+    type="button"
+    onClick={submit}
+    disabled={status === "loading"}
+    className="
+      w-full
+      rounded-xl
+      bg-[#cda14c]
+      px-7
+      py-3
+      font-medium
+      text-[#153e37]
+      shadow-[0_8px_22px_rgba(100,75,25,0.14)]
+      transition
+      hover:-translate-y-0.5
+      hover:bg-[#d8ad5b]
+      disabled:opacity-60
+      sm:w-auto
+      sm:min-w-[190px]
+    "
+  >
+    {status === "loading"
+      ? "Submitting…"
+      : status === "error"
+        ? "Try again →"
+        : "Request journey →"}
+  </button>
+</div>
 
       {/* RIGHT IMAGE */}
 
@@ -2848,7 +2810,7 @@ export default function JourneyBuilder() {
 
             ================================================ */}
 
-            {step !== 0 && (
+            {step !== 0 && step !== TOTAL - 1 && (
 
               <div
 
