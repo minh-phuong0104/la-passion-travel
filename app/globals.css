@@ -3,3 +3,71 @@
 body{background:#F7F3EA;color:#171714;font-family:var(--font-sans)}
 *:focus-visible{outline:2px solid #C89B48;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:root {
+  --font-ui: var(--font-sfu-futura), Arial, Helvetica, sans-serif;
+}
+
+/* Base */
+html,
+body {
+  font-family: var(--font-ui);
+}
+
+body,
+p,
+span,
+a,
+li,
+label,
+input,
+textarea,
+select,
+button,
+th,
+td,
+small {
+  font-family: var(--font-ui);
+  font-weight: 400;
+}
+
+/* Headings + highlighted text */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-serif,
+.font-display,
+nav a,
+button,
+[role='button'] {
+  font-family: var(--font-ui) !important;
+  font-weight: 700;
+}
+
+/* Keep Tailwind utility classes consistent */
+.font-sans {
+  font-family: var(--font-ui) !important;
+  font-weight: 400;
+}
+
+.font-serif {
+  font-family: var(--font-ui) !important;
+  font-weight: 700;
+}
+
+/* Form placeholders */
+input::placeholder,
+textarea::placeholder {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Optional: make uppercase labels look cleaner with Futura */
+.tracking-\[0\.2em\],
+.tracking-\[0\.16em\],
+.tracking-\[0\.18em\] {
+  letter-spacing: 0.18em;
+}
