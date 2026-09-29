@@ -1206,11 +1206,13 @@ export default function JourneyBuilder() {
 
             border
 
-            border-white/70
+            border-white/50
 
-            bg-white/95
+            bg-white/78
 
-            shadow-[0_25px_80px_rgba(0,0,0,0.26)]
+            backdrop-blur-[3px]
+
+            shadow-[0_25px_80px_rgba(0,0,0,0.22)]
 
             md:min-h-[calc(100vh-32px)]
 
@@ -2218,16 +2220,18 @@ export default function JourneyBuilder() {
                     className="
                       grid
                       overflow-hidden
-                      rounded-[22px]
+                      rounded-[24px]
                       border
-                      border-black/10
-                      bg-[#fdfcf9]
-                      shadow-[0_12px_35px_rgba(0,0,0,0.07)]
-                      lg:grid-cols-[1.4fr_0.6fr]
+                      border-white/65
+                      bg-white/88
+                      backdrop-blur-[6px]
+                      shadow-[0_16px_42px_rgba(0,0,0,0.10)]
+                      lg:min-h-[485px]
+                      lg:grid-cols-[1.08fr_0.92fr]
                     "
                   >
                     {/* LEFT FORM */}
-                    <div className="p-4 md:p-5">
+                    <div className="p-5 md:p-6 lg:px-7 lg:py-6">
                       <div className="grid gap-2.5">
                         {/* BUDGET + SPECIAL REQUEST */}
                         <div className="grid gap-3 md:grid-cols-[0.9fr_1.1fr]">
@@ -2458,7 +2462,8 @@ export default function JourneyBuilder() {
                     <div
                       className="
                         relative hidden
-                        min-h-[390px]
+                        h-full
+                        min-h-[485px]
                         overflow-hidden
                         lg:block
                       "
@@ -2467,28 +2472,28 @@ export default function JourneyBuilder() {
                         src="/images/journey/Danang.jpg"
                         alt="Vietnam travel"
                         fill
-                        sizes="34vw"
-                        className="object-cover"
+                        sizes="(min-width: 1024px) 44vw, 100vw"
+                        className="object-cover object-center"
                       />
 
                       <div
                         className="
                           absolute inset-0
                           bg-gradient-to-t
-                          from-[#073d38]/85
-                          via-[#073d38]/15
-                          to-transparent
+                          from-[#073d38]/90
+                          via-[#073d38]/22
+                          to-black/5
                         "
                       />
 
-                      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                        <p className="text-[9px] uppercase tracking-[0.3em] text-[#e0b45d]">
+                      <div className="absolute inset-x-0 bottom-0 p-7 text-white lg:p-8">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[#e0b45d]">
                           La Passion Travel
                         </p>
-                        <p className="mt-2 max-w-[240px] font-serif text-[25px] leading-[1.02]">
+                        <p className="mt-3 max-w-[320px] font-serif text-[34px] leading-[0.98] tracking-[-0.02em]">
                           Your journey starts here.
                         </p>
-                        <p className="mt-2 max-w-[240px] text-[12px] leading-4 text-white/75">
+                        <p className="mt-3 max-w-[320px] text-[14px] leading-5 text-white/80">
                           A journey tailored to the way you want to experience Vietnam.
                         </p>
                       </div>
