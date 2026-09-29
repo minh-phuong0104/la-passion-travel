@@ -26,17 +26,33 @@ export default function Home() {
 
       {/* HEADER */}
       <header className="relative z-20 flex items-center justify-between px-7 py-6 md:px-12 lg:px-16 xl:px-20">
+      
         {/* LOGO */}
-        <div className="relative h-[82px] w-[250px] md:h-[94px] md:w-[290px] lg:h-[104px] lg:w-[320px]">
-          <Image
-            src="/images/logo-la-passion.png"
-            alt="La Passion Travel"
-            fill
-            priority
-            className="object-contain object-left"
-          />
-        </div>
+<div
+  className="
+    relative
+    h-[92px]
+    w-[92px]
+    shrink-0
+    overflow-hidden
+    rounded-full
+    border
+    border-[#d2a34a]/60
+    bg-[#123f3a]
+    shadow-[0_8px_24px_rgba(0,0,0,0.18)]
 
+    md:h-[104px]
+    md:w-[104px]
+  "
+>
+  <Image
+    src="/images/logo-la-passion.png"
+    alt="La Passion Travel"
+    fill
+    priority
+    className="object-contain p-3"
+  />
+</div>
         {/* NAVIGATION */}
         <nav className="hidden items-center gap-7 text-[14px] text-white/85 md:flex lg:gap-10">
           <a href="#journey" className="transition hover:text-white">
