@@ -7,6 +7,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
+  getCountries,
+  getCountryCallingCode,
+  type Country,
+} from "react-phone-number-input";
+import countryLabels from "react-phone-number-input/locale/en";
+
+import {
 
   DEST,
 
@@ -39,6 +46,14 @@ import { normalize, validateLead } from "@/lib/leads/validate";
 const KEY = "lp_journey_en_v2";
 
 const TOTAL = 5;
+
+const COUNTRY_OPTIONS = getCountries()
+  .map((country) => ({
+    country,
+    name: countryLabels[country] || country,
+    code: `+${getCountryCallingCode(country)}`,
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 /* =========================================================
 
@@ -136,7 +151,7 @@ function Card({
 
       className={`
 
-        relative min-h-[118px] rounded-[16px] border p-5 text-left
+        relative min-h-[92px] rounded-[16px] border p-4 text-left
 
         transition duration-200
 
@@ -182,7 +197,7 @@ function Card({
 
     >
 
-      <span className="block pr-9 font-serif text-[22px]">
+      <span className="block pr-9 font-serif text-[20px]">
 
         {label}
 
@@ -192,7 +207,7 @@ function Card({
 
         <span
 
-          className={`mt-2 block text-[13px] leading-5 ${
+          className={`mt-1.5 block text-[12px] leading-4 ${
 
             on ? "text-white/75" : "text-black/55"
 
@@ -282,7 +297,7 @@ function DestinationCard({
 
       className={`
 
-        group relative block h-[215px] w-full
+        group relative block h-[160px] w-full
 
         overflow-hidden rounded-[17px] text-left
 
@@ -420,9 +435,9 @@ function DestinationCard({
 
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+      <div className="absolute inset-x-0 bottom-0 p-4 text-white">
 
-        <h3 className="font-serif text-[26px] leading-none">
+        <h3 className="font-serif text-[22px] leading-none">
 
           {label}
 
@@ -430,7 +445,7 @@ function DestinationCard({
 
         {sub && (
 
-          <p className="mt-2 text-[12px] leading-[1.45] text-white/85">
+          <p className="mt-1.5 text-[11px] leading-[1.35] text-white/85">
 
             {sub}
 
@@ -468,9 +483,9 @@ const inp = `
 
   px-4
 
-  py-3
+  py-2.5
 
-  text-base
+  text-[15px]
 
   outline-none
 
@@ -506,7 +521,9 @@ export default function JourneyBuilder() {
 
     phone: "",
 
-    countryCode: "",
+    countryIso: "VN" as Country,
+
+    countryCode: "+84",
 
     consent: false,
 
@@ -980,7 +997,7 @@ export default function JourneyBuilder() {
 
         grid-cols-1
 
-        gap-4
+        gap-3
 
         sm:grid-cols-2
 
@@ -1086,13 +1103,13 @@ export default function JourneyBuilder() {
 
         className="
 
-          mt-3
+          mt-2
 
           whitespace-pre-line
 
           font-serif
 
-          text-[42px]
+          text-[36px]
 
           leading-[0.98]
 
@@ -1100,7 +1117,7 @@ export default function JourneyBuilder() {
 
           text-[#1e1d19]
 
-          md:text-[55px]
+          md:text-[44px]
 
         "
 
@@ -1114,15 +1131,15 @@ export default function JourneyBuilder() {
 
         className="
 
-          mb-7
+          mb-4
 
-          mt-4
+          mt-2
 
           max-w-2xl
 
-          text-[15px]
+          text-[14px]
 
-          leading-6
+          leading-5
 
           text-black/60
 
@@ -1246,15 +1263,19 @@ export default function JourneyBuilder() {
 
           px-3
 
-          py-4
+          py-3
 
-          md:px-8
+          md:px-5
 
-          md:py-8
+          md:py-4
 
-          xl:px-12
+          lg:h-[100dvh]
 
-          xl:py-10
+          lg:overflow-hidden
+
+          xl:px-6
+
+          xl:py-4
 
         "
 
@@ -1274,7 +1295,7 @@ export default function JourneyBuilder() {
 
             flex
 
-            min-h-[calc(100vh-32px)]
+            min-h-[calc(100vh-24px)]
 
             max-w-[1200px]
 
@@ -1292,9 +1313,13 @@ export default function JourneyBuilder() {
 
             shadow-[0_25px_80px_rgba(0,0,0,0.26)]
 
-            md:min-h-[calc(100vh-64px)]
+            md:min-h-[calc(100vh-32px)]
 
             md:rounded-[32px]
+
+            lg:h-[calc(100dvh-32px)]
+
+            lg:min-h-0
 
           "
 
@@ -1318,11 +1343,11 @@ export default function JourneyBuilder() {
 
               px-6
 
-              pt-5
+              pt-3
 
-              md:px-10
+              md:px-8
 
-              md:pt-7
+              md:pt-4
 
             "
 
@@ -1334,9 +1359,9 @@ export default function JourneyBuilder() {
 
                 relative
 
-                h-[100px]
+                h-[72px]
 
-                w-[100px]
+                w-[72px]
 
                 shrink-0
 
@@ -1352,9 +1377,9 @@ export default function JourneyBuilder() {
 
                 shadow-[0_8px_24px_rgba(0,0,0,0.13)]
 
-                md:h-[116px]
+                md:h-[80px]
 
-                md:w-[116px]
+                md:w-[80px]
 
               "
 
@@ -1406,11 +1431,11 @@ export default function JourneyBuilder() {
 
               px-6
 
-              pb-7
+              pb-4
 
-              md:px-10
+              md:px-8
 
-              md:pb-9
+              md:pb-5
 
             "
 
@@ -1670,9 +1695,9 @@ export default function JourneyBuilder() {
 
                 flex-1
 
-                pt-8
+                pt-4
 
-                md:pt-10
+                md:pt-5
 
               "
 
@@ -1710,7 +1735,7 @@ export default function JourneyBuilder() {
 
                       grid-cols-1
 
-                      gap-5
+                      gap-3
 
                       md:grid-cols-2
 
@@ -2354,9 +2379,9 @@ export default function JourneyBuilder() {
 
       {/* LEFT FORM */}
 
-      <div className="p-6 md:p-8">
+      <div className="p-5 md:p-6">
 
-        <div className="grid gap-5">
+        <div className="grid gap-3.5">
 
           {/* BUDGET */}
 
@@ -2412,7 +2437,7 @@ export default function JourneyBuilder() {
 
               className={inp}
 
-              rows={3}
+              rows={2}
 
               maxLength={500}
 
@@ -2438,13 +2463,13 @@ export default function JourneyBuilder() {
 
           <div className="border-t border-black/10 pt-2">
 
-            <h2 className="font-serif text-[28px]">
+            <h2 className="font-serif text-[24px]">
 
               Contact details
 
             </h2>
 
-            <p className="mt-1 text-sm text-black/50">
+            <p className="mt-1 text-[13px] text-black/50">
 
               We will contact you via WhatsApp to finalize your journey.
 
@@ -2454,7 +2479,7 @@ export default function JourneyBuilder() {
 
           {/* NAME + EMAIL */}
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
 
             <div>
 
@@ -2544,53 +2569,82 @@ export default function JourneyBuilder() {
 
           </div>
 
-          {/* WHATSAPP */}
+          {/* COUNTRY CODE + OPTIONAL WHATSAPP */}
 
-          <div>
+          <div className="grid gap-3 sm:grid-cols-[1.05fr_1.35fr]">
 
             <label className="text-sm font-medium text-black/75">
 
-              WhatsApp number
+              Country / calling code
 
-              <input
-
-                type="tel"
-
-                inputMode="tel"
-
-                aria-label="WhatsApp number"
-
+              <select
                 className={inp}
-
-                autoComplete="tel"
-
-                aria-invalid={!!errs.phone}
-
-                aria-describedby="phone-e"
-
-                value={c.phone}
-
-                onChange={(e) =>
-
+                value={c.countryIso}
+                onChange={(e) => {
+                  const country = e.currentTarget.value as Country;
                   setC({
-
                     ...c,
-
-                    phone:
-
-                      e.currentTarget.value,
-
-                  })
-
-                }
-
-                placeholder="e.g. +84 912 345 678"
-
-              />
+                    countryIso: country,
+                    countryCode: `+${getCountryCallingCode(country)}`,
+                  });
+                }}
+              >
+                {COUNTRY_OPTIONS.map(({ country, name, code }) => (
+                  <option key={country} value={country}>
+                    {name} ({code})
+                  </option>
+                ))}
+              </select>
 
             </label>
 
-            {err("phone")}
+            <div>
+
+              <label className="text-sm font-medium text-black/75">
+
+                WhatsApp number (optional)
+
+                <input
+
+                  type="tel"
+
+                  inputMode="tel"
+
+                  aria-label="WhatsApp number"
+
+                  className={inp}
+
+                  autoComplete="tel-national"
+
+                  aria-invalid={!!errs.phone}
+
+                  aria-describedby="phone-e"
+
+                  value={c.phone}
+
+                  onChange={(e) =>
+
+                    setC({
+
+                      ...c,
+
+                      phone:
+
+                        e.currentTarget.value,
+
+                    })
+
+                  }
+
+                  placeholder="912 345 678"
+
+                />
+
+              </label>
+
+              {err("phone")}
+
+            </div>
 
           </div>
 
@@ -2610,7 +2664,7 @@ export default function JourneyBuilder() {
 
               bg-[#f5f2e9]
 
-              p-4
+              p-3.5
 
               text-sm
 
@@ -2712,7 +2766,7 @@ export default function JourneyBuilder() {
 
           hidden
 
-          min-h-[590px]
+          min-h-[0px]
 
           overflow-hidden
 
@@ -2756,7 +2810,7 @@ export default function JourneyBuilder() {
 
         />
 
-        <div className="absolute inset-x-0 bottom-0 p-8 text-white">
+        <div className="absolute inset-x-0 bottom-0 p-6 text-white">
 
           <p className="text-[10px] uppercase tracking-[0.32em] text-[#e0b45d]">
 
@@ -2764,13 +2818,13 @@ export default function JourneyBuilder() {
 
           </p>
 
-          <p className="mt-3 max-w-[280px] font-serif text-[32px] leading-[1.05]">
+          <p className="mt-3 max-w-[280px] font-serif text-[28px] leading-[1.05]">
 
             Your journey starts here.
 
           </p>
 
-          <p className="mt-4 max-w-[280px] text-sm leading-6 text-white/75">
+          <p className="mt-3 max-w-[280px] text-[13px] leading-5 text-white/75">
 
             A journey tailored to the way you want to experience Vietnam.
 
@@ -2798,7 +2852,7 @@ export default function JourneyBuilder() {
 
               <div
 
-                className="mt-6 flex justify-end pb-1"
+                className="mt-3 flex justify-end pb-1"
 
               >
 
@@ -2832,7 +2886,7 @@ export default function JourneyBuilder() {
 
                       px-9
 
-                      py-4
+                      py-3
 
                       font-medium
 
@@ -2886,7 +2940,7 @@ export default function JourneyBuilder() {
 
                       px-9
 
-                      py-4
+                      py-3
 
                       font-medium
 

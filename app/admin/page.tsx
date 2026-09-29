@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import {
   dateTime,
+  leadSourceLabel,
   listOrDash,
   phoneNumber,
   statusStyle,
@@ -23,6 +24,8 @@ type RecentLead = {
   budget: string | null;
   traffic_type: string;
   traffic_channel: string;
+  first_touch_source: string | null;
+  first_touch_referrer: string | null;
   status: string;
   created_at: string;
 };
@@ -30,27 +33,56 @@ type RecentLead = {
 export default async function AdminPage() {
   const { supabase, profile } = await requireStaff();
 
-  const [totalResult, newResult, contactedResult, qualifiedResult, wonResult, recentResult] =
-    await Promise.all([
-      supabase.from('leads').select('id', { count: 'exact', head: true }),
-      supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-      supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'contacted'),
-      supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'qualified'),
-      supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'won'),
-      supabase
-        .from('leads')
-        .select(
-          'id,full_name,phone,country_code,email,destinations,budget,traffic_type,traffic_channel,status,created_at',
-        )
-        .order('created_at', { ascending: false })
-        .limit(5),
-    ]);
+  const [
+    totalResult,
+    newResult,
+    contactedResult,
+    qualifiedResult,
+    wonResult,
+    instagramResult,
+    facebookResult,
+    gfiResult,
+    recentResult,
+  ] = await Promise.all([
+    supabase.from('leads').select('id', { count: 'exact', head: true }),
+    supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+    supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'contacted'),
+    supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'qualified'),
+    supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'won'),
+
+    // Reliable when campaign links use lowercase utm_source=instagram / facebook / gfi.
+    supabase
+      .from('leads')
+      .select('id', { count: 'exact', head: true })
+      .in('first_touch_source', ['instagram', 'ig']),
+    supabase
+      .from('leads')
+      .select('id', { count: 'exact', head: true })
+      .in('first_touch_source', ['facebook', 'fb']),
+    supabase
+      .from('leads')
+      .select('id', { count: 'exact', head: true })
+      .eq('first_touch_source', 'gfi'),
+
+    supabase
+      .from('leads')
+      .select(
+        'id,full_name,phone,country_code,email,destinations,budget,traffic_type,traffic_channel,first_touch_source,first_touch_referrer,status,created_at',
+      )
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ]);
 
   const total = totalResult.count ?? 0;
   const newCount = newResult.count ?? 0;
   const contactedCount = contactedResult.count ?? 0;
   const qualifiedCount = qualifiedResult.count ?? 0;
   const wonCount = wonResult.count ?? 0;
+
+  const instagramCount = instagramResult.count ?? 0;
+  const facebookCount = facebookResult.count ?? 0;
+  const gfiCount = gfiResult.count ?? 0;
+
   const recentLeads = (recentResult.data ?? []) as RecentLead[];
 
   const hasError = Boolean(
@@ -59,6 +91,9 @@ export default async function AdminPage() {
       contactedResult.error ||
       qualifiedResult.error ||
       wonResult.error ||
+      instagramResult.error ||
+      facebookResult.error ||
+      gfiResult.error ||
       recentResult.error,
   );
 
@@ -70,12 +105,18 @@ export default async function AdminPage() {
     { label: 'Won', value: wonCount, href: '/admin/leads?status=won' },
   ];
 
+  const sources = [
+    { label: 'Instagram', value: instagramCount },
+    { label: 'Facebook', value: facebookCount },
+    { label: 'GFI', value: gfiCount },
+  ];
+
   return (
     <div className="min-h-screen bg-cream">
       <AdminHeader name={profile.full_name || profile.email} role={profile.role} />
 
-      <main className="mx-auto max-w-7xl px-5 py-9 sm:px-8 sm:py-12">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+      <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-5">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-olive">
               La Passion Travel
@@ -120,7 +161,32 @@ export default async function AdminPage() {
           ))}
         </section>
 
-        <section className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-forest/10">
+        <section className="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-forest/10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-olive">
+                Acquisition source
+              </p>
+              <h2 className="mt-1 font-serif text-2xl text-forest">Where leads came from</h2>
+            </div>
+            <p className="text-xs text-olive">
+              Uses first-touch UTM source
+            </p>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {sources.map((source) => (
+              <div key={source.label} className="rounded-xl bg-cream/70 px-4 py-4 ring-1 ring-forest/10">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-olive">
+                  {source.label}
+                </p>
+                <p className="mt-2 font-serif text-3xl text-forest">{source.value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-5 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-forest/10">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-forest/10 px-6 py-5">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-olive">
@@ -143,7 +209,7 @@ export default async function AdminPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] border-collapse text-left">
+              <table className="w-full min-w-[950px] border-collapse text-left">
                 <thead className="bg-forest/[0.035] text-xs font-semibold uppercase tracking-[0.13em] text-olive">
                   <tr>
                     <th className="px-6 py-4">Customer</th>
@@ -178,9 +244,15 @@ export default async function AdminPage() {
                       <td className="px-4 py-5 text-sm text-ink">{textOrDash(lead.budget)}</td>
 
                       <td className="px-4 py-5 text-sm text-ink">
-                        <span className="font-medium">{titleCase(lead.traffic_type)}</span>
-                        <span className="mt-1 block text-olive">
-                          {titleCase(lead.traffic_channel)}
+                        <span className="font-semibold text-forest">
+                          {leadSourceLabel(
+                            lead.first_touch_source,
+                            lead.first_touch_referrer,
+                            lead.traffic_channel,
+                          )}
+                        </span>
+                        <span className="mt-1 block text-xs text-olive">
+                          {titleCase(lead.traffic_type)} · {titleCase(lead.traffic_channel)}
                         </span>
                       </td>
 
