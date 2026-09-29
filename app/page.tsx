@@ -6,12 +6,12 @@ import "./globals.css";
 const sfuFutura = localFont({
   src: [
     {
-      path: "../public/fonts/SFUFuturaRegular.TTF",
+      path: "../public/SFUFuturaRegular.TTF",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/SFUFuturaBold.TTF",
+      path: "../public/SFUFuturaBold.TTF",
       weight: "700",
       style: "normal",
     },
