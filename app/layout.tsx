@@ -9,12 +9,12 @@ import AnalyticsInit from "@/components/AnalyticsInit";
 const sfuFutura = localFont({
   src: [
     {
-      path: "../public/SFUFuturaRegular.TTF",
+      path: "../public/SFUFuturaRegular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/SFUFuturaBold.TTF",
+      path: "../public/SFUFuturaBold.ttf",
       weight: "700",
       style: "normal",
     },
