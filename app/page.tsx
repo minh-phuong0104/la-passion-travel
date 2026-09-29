@@ -118,7 +118,7 @@ export default function Home() {
           >
             Your Vietnam
             <br />
-            begins here.
+            begins here
           </h1>
 
           {/* DESCRIPTION */}
