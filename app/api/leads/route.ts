@@ -7,7 +7,13 @@ export async function POST(req:Request){
  let body:unknown;try{body=await req.json()}catch{return fail('Invalid request data.',400)}
  const p=normalize(body);const errs=validateLead(p);
  if(Object.keys(errs).length) return fail('Please check the information you entered.',422,{fields:errs});
- const url=process.env.SUPABASE_URL||process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+ const url =
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+const key =
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
  if(!url||!key){console.error('[leads] Supabase env missing');return fail('We could not submit your request right now. Please try again shortly.',503)}
  const db=createClient(url,key,{auth:{persistSession:false}});
  const c=classifyPayload(p),f=p.firstTouch,l=p.lastTouch;
