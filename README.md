@@ -54,3 +54,4 @@ Use `SUPABASE_SERVICE_ROLE_KEY` and `LEAD_WEBHOOK_*` only on the server.
 ## Change images or steps
 - Images: `lib/journey-config.ts` (`IMAGES`)
 - Steps and options: `lib/journey-config.ts` and `components/journey/JourneyBuilder.tsx`
+# la-passion-travel
