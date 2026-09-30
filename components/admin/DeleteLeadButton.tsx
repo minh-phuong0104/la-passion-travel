@@ -10,6 +10,7 @@ export function DeleteLeadButton({
   return (
     <form
       action={deleteLead}
+      className="w-full"
       onSubmit={(event) => {
         const confirmed = window.confirm(
           "Delete this lead permanently? This cannot be undone.",
@@ -23,7 +24,7 @@ export function DeleteLeadButton({
       <input type="hidden" name="id" value={id} />
       <button
         type="submit"
-        className="rounded-lg border border-red-400/25 bg-red-500/10 px-3.5 py-2 text-xs font-bold text-red-300 transition hover:bg-red-500/20"
+        className="inline-flex min-h-9 w-full items-center justify-center rounded-lg border border-red-400/25 bg-red-500/10 px-3.5 py-2 text-xs font-bold text-red-300 transition hover:bg-red-500/20"
       >
         Delete
       </button>

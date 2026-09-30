@@ -29,7 +29,10 @@ import {
 
 } from "@/lib/journey-config";
 
-import { initAttribution } from "@/lib/attribution/storage";
+import {
+  initAttribution,
+  KEY as ATTRIBUTION_KEY,
+} from "@/lib/attribution/storage";
 
 import { classify } from "@/lib/attribution/classify";
 
@@ -839,6 +842,12 @@ export default function JourneyBuilder() {
         localStorage.removeItem(
 
           KEY,
+
+        );
+
+        localStorage.removeItem(
+
+          ATTRIBUTION_KEY,
 
         );
 

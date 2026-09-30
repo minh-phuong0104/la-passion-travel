@@ -35,6 +35,8 @@ type LeadSummary = {
   traffic_channel: string;
   first_touch_source: string | null;
   first_touch_content: string | null;
+  last_touch_source: string | null;
+  last_touch_content: string | null;
   status: string;
   created_at: string;
 };
@@ -55,6 +57,31 @@ const platforms = [
 ] as const;
 
 const pageSize = 25;
+
+function hasTrackedPartner(
+  source: string | null | undefined,
+  content: string | null | undefined,
+) {
+  const normalizedSource = String(source ?? "")
+    .trim()
+    .toLowerCase();
+  const normalizedContent = String(content ?? "")
+    .trim()
+    .toLowerCase();
+
+  const isPartnerPlatform =
+    normalizedSource === "instagram" ||
+    normalizedSource === "ig" ||
+    normalizedSource === "facebook" ||
+    normalizedSource === "fb";
+
+  return (
+    isPartnerPlatform &&
+    PARTNER_SOURCES.some(
+      (item) => item.key === normalizedContent,
+    )
+  );
+}
 
 function first(
   value:
@@ -209,7 +236,7 @@ export default async function LeadsPage({
   let query = supabase
     .from("leads")
     .select(
-      "id,full_name,phone,country_code,email,destinations,duration,budget,traffic_type,traffic_channel,first_touch_source,first_touch_content,status,created_at",
+      "id,full_name,phone,country_code,email,destinations,duration,budget,traffic_type,traffic_channel,first_touch_source,first_touch_content,last_touch_source,last_touch_content,status,created_at",
       { count: "exact" },
     );
 
@@ -221,23 +248,20 @@ export default async function LeadsPage({
   }
 
   if (platform === "instagram") {
-    query = query.in(
-      "first_touch_source",
-      ["instagram", "ig"],
+    query = query.or(
+      "first_touch_source.in.(instagram,ig),last_touch_source.in.(instagram,ig)",
     );
   }
 
   if (platform === "facebook") {
-    query = query.in(
-      "first_touch_source",
-      ["facebook", "fb"],
+    query = query.or(
+      "first_touch_source.in.(facebook,fb),last_touch_source.in.(facebook,fb)",
     );
   }
 
   if (partner !== "all") {
-    query = query.eq(
-      "first_touch_content",
-      partner,
+    query = query.or(
+      `first_touch_content.eq.${partner},last_touch_content.eq.${partner}`,
     );
   }
 
@@ -509,13 +533,13 @@ export default async function LeadsPage({
                       <th className="px-4 py-4">
                         Budget
                       </th>
-                      <th className="px-4 py-4">
+                      <th className="px-4 py-4 text-center">
                         Source
                       </th>
-                      <th className="px-4 py-4">
+                      <th className="px-4 py-4 text-center">
                         Status
                       </th>
-                      <th className="px-6 py-4">
+                      <th className="px-6 py-4 text-center">
                         Action
                       </th>
                     </tr>
@@ -530,12 +554,22 @@ export default async function LeadsPage({
                             lead.country_code,
                           );
 
+                        const preferLastTouch =
+                          hasTrackedPartner(
+                            lead.last_touch_source,
+                            lead.last_touch_content,
+                          );
+
                         const source =
                           sourceDisplay({
                             source:
-                              lead.first_touch_source,
+                              preferLastTouch
+                                ? lead.last_touch_source
+                                : lead.first_touch_source,
                             content:
-                              lead.first_touch_content,
+                              preferLastTouch
+                                ? lead.last_touch_content
+                                : lead.first_touch_content,
                             trafficChannel:
                               lead.traffic_channel,
                           });
@@ -545,7 +579,7 @@ export default async function LeadsPage({
                             key={lead.id}
                             className="border-t border-white/[0.07] transition hover:bg-white/[0.035]"
                           >
-                            <td className="px-6 py-4">
+                            <td className="px-6 py-4 align-middle">
                               <Link
                                 href={`/admin/leads/${lead.id}`}
                                 className="font-bold text-[#00c58a] hover:text-[#38e5ad]"
@@ -564,13 +598,13 @@ export default async function LeadsPage({
                               </p>
                             </td>
 
-                            <td className="px-4 py-4 text-sm text-white/70">
+                            <td className="px-4 py-4 align-middle text-sm text-white/70">
                               {textOrDash(
                                 lead.duration,
                               )}
                             </td>
 
-                            <td className="max-w-64 px-4 py-4 text-sm text-white/70">
+                            <td className="max-w-64 px-4 py-4 align-middle text-sm text-white/70">
                               <span className="line-clamp-2">
                                 {listOrDash(
                                   lead.destinations,
@@ -578,13 +612,13 @@ export default async function LeadsPage({
                               </span>
                             </td>
 
-                            <td className="px-4 py-4 text-sm text-white/70">
+                            <td className="px-4 py-4 align-middle text-sm text-white/70">
                               {textOrDash(
                                 lead.budget,
                               )}
                             </td>
 
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-4 text-center align-middle">
                               <span className="block text-xs font-bold text-white/75">
                                 {
                                   source.platform
@@ -603,7 +637,7 @@ export default async function LeadsPage({
                               )}
                             </td>
 
-                            <td className="px-4 py-4">
+                            <td className="px-4 py-4 text-center align-middle">
                               <span
                                 className={`inline-flex rounded-md border px-2.5 py-1 text-xs font-bold ${statusClass(
                                   lead.status,
@@ -615,17 +649,19 @@ export default async function LeadsPage({
                               </span>
                             </td>
 
-                            <td className="px-6 py-4">
-                              <Link
-                                href={`/admin/leads/${lead.id}`}
-                                className="rounded-lg bg-[#00c58a] px-3.5 py-2 text-xs font-bold text-[#10231d] transition hover:bg-[#19d99d]"
-                              >
-                                Open
-                              </Link>
+                            <td className="px-6 py-4 align-middle">
+                              <div className="mx-auto flex w-[92px] flex-col gap-2">
+                                <Link
+                                  href={`/admin/leads/${lead.id}`}
+                                  className="inline-flex min-h-9 w-full items-center justify-center rounded-lg bg-[#00c58a] px-3.5 py-2 text-xs font-bold text-[#10231d] transition hover:bg-[#19d99d]"
+                                >
+                                  Open
+                                </Link>
 
-                              {profile.role === "admin" && (
-                                <DeleteLeadButton id={lead.id} />
-                              )}
+                                {profile.role === "admin" && (
+                                  <DeleteLeadButton id={lead.id} />
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
