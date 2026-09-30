@@ -677,13 +677,18 @@ export default function JourneyBuilder() {
 
     }));
 
-  const optional =
+  const optional = false;
 
-    step === 1 ||
-
-    step === 2 ||
-
-    step === 3;
+  const canContinue =
+    step === 0
+      ? j.destinations.length > 0
+      : step === 1
+        ? Boolean(j.duration)
+        : step === 2
+          ? Boolean(j.companion)
+          : step === 3
+            ? j.experiences.length > 0 && Boolean(j.pace)
+            : true;
 
   /* =========================================================
 
@@ -1781,6 +1786,10 @@ export default function JourneyBuilder() {
 
                       }
 
+                      disabled={!canContinue}
+
+                      aria-disabled={!canContinue}
+
                       className="
 
                         ml-auto
@@ -1816,6 +1825,14 @@ export default function JourneyBuilder() {
                         hover:-translate-y-0.5
 
                         hover:bg-[#d8ad5b]
+
+                        disabled:cursor-not-allowed
+
+                        disabled:opacity-45
+
+                        disabled:hover:translate-y-0
+
+                        disabled:hover:bg-[#cda14c]
 
                       "
 
@@ -2521,6 +2538,8 @@ export default function JourneyBuilder() {
                 <button
                   type="button"
                   onClick={() => setStep(step + 1)}
+                  disabled={!canContinue}
+                  aria-disabled={!canContinue}
                   className="
                     w-full
                     rounded-xl
@@ -2533,6 +2552,10 @@ export default function JourneyBuilder() {
                     transition
                     hover:-translate-y-0.5
                     hover:bg-[#d8ad5b]
+                    disabled:cursor-not-allowed
+                    disabled:opacity-45
+                    disabled:hover:translate-y-0
+                    disabled:hover:bg-[#cda14c]
                     sm:w-auto
                   "
                 >

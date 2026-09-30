@@ -1,6 +1,10 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import {
+  recommendItineraries,
+  type MatchableItinerary,
+} from "@/lib/itineraries/match";
 import { itineraryDownloadUrl } from "@/lib/itineraries/url";
 import { createServiceSupabaseClient } from "@/lib/supabase/service";
 
@@ -15,6 +19,11 @@ function isUuid(value: unknown): value is string {
   );
 }
 
+type DownloadableItinerary = MatchableItinerary & {
+  pdf_url: string;
+  is_active: boolean;
+};
+
 export async function POST(req: Request) {
   let body: unknown;
 
@@ -22,10 +31,7 @@ export async function POST(req: Request) {
     body = await req.json();
   } catch {
     return NextResponse.json(
-      {
-        success: false,
-        error: "Invalid request.",
-      },
+      { success: false, error: "Invalid request." },
       { status: 400 },
     );
   }
@@ -34,23 +40,18 @@ export async function POST(req: Request) {
     typeof body === "object" &&
     body !== null &&
     "itineraryId" in body
-      ? (body as { itineraryId?: unknown })
-          .itineraryId
+      ? (body as { itineraryId?: unknown }).itineraryId
       : null;
 
   if (!isUuid(itineraryId)) {
     return NextResponse.json(
-      {
-        success: false,
-        error: "Invalid itinerary.",
-      },
+      { success: false, error: "Invalid itinerary." },
       { status: 400 },
     );
   }
 
   const cookieStore = await cookies();
-  const leadId =
-    cookieStore.get("lp_recent_lead")?.value;
+  const leadId = cookieStore.get("lp_recent_lead")?.value;
 
   if (!isUuid(leadId)) {
     return NextResponse.json(
@@ -66,28 +67,24 @@ export async function POST(req: Request) {
   try {
     const db = createServiceSupabaseClient();
 
-    const [
-      leadResult,
-      itineraryResult,
-    ] = await Promise.all([
+    const [leadResult, itineraryResult] = await Promise.all([
       db
         .from("leads")
-        .select("id")
+        .select("id,destinations,duration")
         .eq("id", leadId)
         .maybeSingle(),
 
       db
         .from("itineraries")
-        .select("id,pdf_url,is_active")
-        .eq("id", itineraryId)
+        .select(
+          "id,title,region,duration,pdf_url,is_active,sort_order",
+        )
         .eq("is_active", true)
-        .maybeSingle(),
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true }),
     ]);
 
-    if (
-      leadResult.error ||
-      !leadResult.data
-    ) {
+    if (leadResult.error || !leadResult.data) {
       return NextResponse.json(
         {
           success: false,
@@ -98,25 +95,47 @@ export async function POST(req: Request) {
       );
     }
 
-    if (
-      itineraryResult.error ||
-      !itineraryResult.data
-    ) {
+    if (itineraryResult.error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Itineraries are temporarily unavailable.",
+        },
+        { status: 503 },
+      );
+    }
+
+    const available =
+      (itineraryResult.data ?? []) as DownloadableItinerary[];
+
+    const recommended = recommendItineraries(
+      {
+        destinations: leadResult.data.destinations,
+        duration: leadResult.data.duration,
+      },
+      available,
+      1,
+    );
+
+    const itinerary = recommended.find(
+      (item) => item.id === itineraryId,
+    );
+
+    if (!itinerary) {
       return NextResponse.json(
         {
           success: false,
           error:
-            "This itinerary is no longer available.",
+            "This file is not the itinerary recommended for your journey.",
         },
-        { status: 404 },
+        { status: 403 },
       );
     }
 
     const { error: logError } = await db
       .from("itinerary_downloads")
       .insert({
-        itinerary_id:
-          itineraryResult.data.id,
+        itinerary_id: itinerary.id,
         lead_id: leadId,
       });
 
@@ -130,10 +149,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      downloadUrl:
-        itineraryDownloadUrl(
-          itineraryResult.data.pdf_url,
-        ),
+      downloadUrl: itineraryDownloadUrl(itinerary.pdf_url),
     });
   } catch (error) {
     console.error(

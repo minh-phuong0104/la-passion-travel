@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import {
   dateTime,
   listOrDash,
@@ -313,6 +314,20 @@ export default async function LeadsPage({
             </div>
           </section>
 
+          {first(params.deleted) === "1" && (
+            <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
+              Lead deleted successfully.
+            </div>
+          )}
+
+          {first(params.error) && (
+            <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-800">
+              {first(params.error) === "admin-only"
+                ? "Only admins can delete leads."
+                : "The lead could not be deleted. Please try again."}
+            </div>
+          )}
+
           <section className="mt-6 rounded-[22px] bg-[#1d1b18] p-5 text-white shadow-[0_12px_28px_rgba(0,0,0,0.10)] sm:p-6">
             <form
               method="get"
@@ -607,6 +622,10 @@ export default async function LeadsPage({
                               >
                                 Open
                               </Link>
+
+                              {profile.role === "admin" && (
+                                <DeleteLeadButton id={lead.id} />
+                              )}
                             </td>
                           </tr>
                         );
