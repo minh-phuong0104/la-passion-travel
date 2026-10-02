@@ -3,16 +3,32 @@ import { capture, hasSignal } from "./capture";
 
 export const KEY = "lp_attribution_v1";
 
+const PARTNER_KEYS = new Set([
+  "vietnammoment",
+  "vietnam_by_local",
+  "vietnam_foodie",
+  "vietnam_sip_n_eat",
+  "la_passion_travel",
+]);
+
+function clean(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * A link is considered an explicit partner-tracking link when:
+ * - the platform is Instagram/Facebook, and
+ * - utm_content is one of the known partner-account keys.
+ *
+ * This intentionally works for bio links, posts, stories and auto-DM links.
+ * The exact medium/campaign can therefore be "social", "dm",
+ * "partner_referral", "auto_message", etc.
+ */
 function isExplicitPartnerTouch(touch: Touch) {
-  const source = String(touch.source || "")
-    .trim()
-    .toLowerCase();
-  const campaign = String(touch.campaign || "")
-    .trim()
-    .toLowerCase();
-  const content = String(touch.content || "")
-    .trim()
-    .toLowerCase();
+  const source = clean(touch.source);
+  const content = clean(touch.content);
 
   const isPartnerPlatform =
     source === "instagram" ||
@@ -22,16 +38,17 @@ function isExplicitPartnerTouch(touch: Touch) {
 
   return (
     isPartnerPlatform &&
-    campaign === "partner_referral" &&
-    content.length > 0
+    PARTNER_KEYS.has(content)
   );
 }
 
 /**
  * First touch normally remains write-once.
- * Exception: an explicit Instagram/Facebook partner tracking link
- * becomes the attribution owner because the sales team needs the
- * exact partner account that sent the lead.
+ *
+ * Exception:
+ * an explicit Instagram/Facebook partner link becomes the attribution owner.
+ * This prevents an older Zalo/referral/direct touch in localStorage from
+ * masking the account that actually sent the customer through the tracked link.
  */
 export function merge(
   stored: Stored | null,
